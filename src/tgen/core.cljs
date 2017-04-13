@@ -20,11 +20,11 @@
       (.appendChild (.-body js/document) (.-domElement stats))
       (swap! STATE assoc :stats stats)))
   ; Scene
-  (swap! STATE merge (create-scene 10 init-scene render-scene)))
+  (swap! STATE assoc :scene (create-scene 10 init-scene render-scene)))
 
 (defn stop-app
   []
-  (if-let [stopper (:stopper @STATE)]
+  (if-let [stopper (get-in @STATE [:scene :stopper])]
     (stopper)
     (swap! STATE dissoc :stopper))
   (if-let [renderer (:renderer @STATE)]
