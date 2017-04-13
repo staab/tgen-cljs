@@ -1,40 +1,27 @@
 (ns ^:figwheel-always tgen.core
     (:require [figwheel.client :as fw]
-              three
-              stats
-              [tgen.scene :refer [create-scene]]
-              [tgen.init :refer [init-scene]]
-              [tgen.render :refer [render-scene]]
-              [tgen.state :refer [STATE]]))
+              [tgen.hooks :refer [hooks]]
+              [tgen.state :refer [initial-state]]
+              [tgen.engine :refer [create-scene]]))
 
 (enable-console-print!)
 
+(def STATE (atom {}))
+
+(defn get-state [] (clj->js @STATE))
+
+(defn get-scene [] (clj->js ((get-in @STATE [:scene :get-scene]))))
+
 (defn start-app
   []
-  ; Stats
-  (when-not (:stats @STATE)
-    (let [stats (js/Stats.)]
-      (set! (.. stats -domElement -style -position) "absolute")
-      (set! (.. stats -domElement -style -left) "0px")
-      (set! (.. stats -domElement -style -top) "0px")
-      (.appendChild (.-body js/document) (.-domElement stats))
-      (swap! STATE assoc :stats stats)))
-  ; Scene
-  (swap! STATE assoc :scene (create-scene 10 init-scene render-scene)))
+  (println "starting")
+  (swap! STATE assoc :scene (create-scene hooks initial-state)))
 
 (defn stop-app
   []
-  (if-let [stopper (get-in @STATE [:scene :stopper])]
-    (stopper)
-    (swap! STATE dissoc :stopper))
-  (if-let [renderer (:renderer @STATE)]
-    (.. js/document -body (removeChild (.-domElement renderer)))
-    (swap! STATE dissoc :renderer))
-  (if-let [stats (:stats @STATE)]
-    (.removeChild (.-body js/document) (.-domElement stats))
-    (swap! STATE dissoc :stats)))
-
-
+  (println "stopping")
+  (if-let [destroy-scene (get-in @STATE [:scene :destroy])]
+    (destroy-scene)))
 
 (fw/start {:on-jsload #(do (stop-app) (start-app))})
 

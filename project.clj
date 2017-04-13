@@ -6,10 +6,9 @@
 
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "0.0-3297"]
-                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]
-                 [medley "0.8.2"]]
+                 [org.clojure/core.async "0.1.346.0-17112a-alpha"]]
 
-  :npm {:dependencies [three "0.79.0"
+  :npm {:dependencies [three "0.84.0"
                        three-orbit-controls "72.0.0"
                        stats.js "0.16.0"]}
 

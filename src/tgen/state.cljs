@@ -1,3 +1,5 @@
 (ns tgen.state)
 
-(defonce STATE (atom {}))
+(def initial-state
+  {:camera {}
+   :lights {:ambient {:kind :ambient :color 0x402020}}})
