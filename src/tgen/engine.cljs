@@ -44,18 +44,35 @@
      :scene scene
      :meshes meshes}))
 
+(defn apply-state-to-scene
+  [scene state prev-state]
+  (doseq [cur (:meshes state)
+          prev (:meshes prev-state)
+          [id mesh] (:meshes scene)]
+    (js/console.log set-mesh)
+    (u/clog cur)
+    (u/clog prev)
+    (js/console.log mesh)
+    (set-mesh cur prev mesh))
+  scene)
+
 (defn render-scene
   [scene state hooks stop-animating]
   (when (not @stop-animating)
     (let [scene-data @scene
+          state-data @state
           renderer (:renderer scene-data)
           three-scene (:scene scene-data)
-          camera (:camera scene-data)]
+          camera (:camera scene-data)
+          recur-render #(render-scene scene state hooks stop-animating)]
       (.render renderer three-scene camera)
       ; Throttle framerate a bit so we don't send our computer to space
       (js/setTimeout
-        (fn [] (js/requestAnimationFrame
-                 #(render-scene scene state hooks stop-animating)))
+        #(do
+           (doseq [hook hooks]
+             (swap! state hook @state state-data))
+           (swap! scene apply-state-to-scene @state state-data)
+           (js/requestAnimationFrame recur-render))
         500))))
 
 (defn create-scene

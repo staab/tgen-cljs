@@ -1,5 +1,6 @@
 (ns tgen.three-utils
-  (:require [three]))
+  (:require [three]
+            [tgen.utils :as u]))
 
 ; Constructors
 
@@ -49,4 +50,4 @@
       (js/THREE.BoxHelper. box 0xffff00)
       box))
   ([cur prev mesh]
-   ))
+   (u/clog mesh)))
